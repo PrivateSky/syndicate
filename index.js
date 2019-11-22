@@ -53,5 +53,6 @@ function getDefaultBootScriptPath(workerStrategy) {
 module.exports = {
     createWorkerPool,
     getDefaultBootScriptPath,
-    PoolConfig: PoolConfig
+    PoolConfig,
+    WorkerStrategies
 };
