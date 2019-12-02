@@ -12,7 +12,7 @@ const WorkerStrategies = require('./lib/WorkerStrategies');
 function createWorkerPool(poolConfig) {
     const newPoolConfig = PoolConfig.createByOverwritingDefaults(poolConfig);
 
-    if (!fs.existsSync(poolConfig.workingDir)) {
+    if (poolConfig.workerOptions.cwd && !fs.existsSync(poolConfig.workerOptions.cwd)) {
         throw new Error(`The provided working directory does not exists ${config.workingDir}`);
     }
 
@@ -33,26 +33,13 @@ function createWorkerPool(poolConfig) {
     return new WorkerPool(concretePool);
 }
 
-function getDefaultBootScriptPath(workerStrategy) {
-
-    let absolutePath = '';
-
-    if(workerStrategy === WorkerStrategies.THREADS) {
-        const relativePath = './lib/defaultBootScripts/ThreadBootScript.js';
-        absolutePath = path.join(__dirname, relativePath);
-    } else if (workerStrategy === WorkerStrategies.ISOLATES) {
-        const relativePath = './lib/defaultBootScripts/IsolatesBootScript.js';
-        absolutePath = path.join(__dirname, relativePath);
-    } else {
-        throw new TypeError(`Could not match provided strategy ${workerStrategy}, expected on of ${WorkerStrategies}`);
-    }
-
-    return absolutePath;
+function loadThreadBootScript(){
+    require("./lib/defaultBootScripts/ThreadBootScript.js");
 }
 
 module.exports = {
     createWorkerPool,
-    getDefaultBootScriptPath,
     PoolConfig,
-    WorkerStrategies
+    WorkerStrategies,
+    loadThreadBootScript
 };
