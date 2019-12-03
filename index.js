@@ -9,7 +9,7 @@ const WorkerStrategies = require('./lib/WorkerStrategies');
  * @throws if providing a working dir that does not exist, the directory should be created externally
  * @throws if trying to use a strategy that does not exist
  */
-function createWorkerPool(poolConfig) {
+function createWorkerPool(poolConfig, workerCreateHelper) {
     const newPoolConfig = PoolConfig.createByOverwritingDefaults(poolConfig);
 
     if (poolConfig.workerOptions.cwd && !fs.existsSync(poolConfig.workerOptions.cwd)) {
@@ -21,11 +21,11 @@ function createWorkerPool(poolConfig) {
     if (newPoolConfig.workerStrategy === WorkerStrategies.THREADS) {
         const PoolThreads = require('./lib/Pool-Threads');
 
-        concretePool = new PoolThreads(newPoolConfig);
+        concretePool = new PoolThreads(newPoolConfig, workerCreateHelper);
     } else if (newPoolConfig.workerStrategy === WorkerStrategies.ISOLATES) {
         const PoolIsolates = require('./lib/Pool-Isolates');
 
-        concretePool = new PoolIsolates(newPoolConfig)
+        concretePool = new PoolIsolates(newPoolConfig, workerCreateHelper)
     } else {
         throw new TypeError(`Could not find a implementation for worker strategy "${newPoolConfig.workerStrategy}"`);
     }
