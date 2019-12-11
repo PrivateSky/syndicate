@@ -33,13 +33,9 @@ function createWorkerPool(poolConfig, workerCreateHelper) {
     return new WorkerPool(concretePool);
 }
 
-function getThreadBootScript(){
-    return `(${require("./lib/defaultBootScripts/ThreadBootScript.js")})()`;
-}
 
 module.exports = {
     createWorkerPool,
-    getThreadBootScript,
     PoolConfig,
     WorkerStrategies
 };
