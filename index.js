@@ -12,7 +12,7 @@ const WorkerStrategies = require('./lib/WorkerStrategies');
 function createWorkerPool(poolConfig, workerCreateHelper) {
     const newPoolConfig = PoolConfig.createByOverwritingDefaults(poolConfig);
 
-    if (poolConfig.workerOptions.cwd && !fs.existsSync(poolConfig.workerOptions.cwd)) {
+    if (newPoolConfig.workerOptions && newPoolConfig.workerOptions.cwd && !fs.existsSync(newPoolConfig.workerOptions.cwd)) {
         throw new Error(`The provided working directory does not exists ${config.workingDir}`);
     }
 
