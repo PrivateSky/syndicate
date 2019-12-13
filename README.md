@@ -4,7 +4,7 @@ This module exposes an interface able to create pools of customizable native or 
 # Quick start 
 
 Here is an example of the quickest way to start and use a worker pool.
-```ecmascript 6
+```js
 const syndicate = require('syndicate');
 
 const {isMainThread} = require('worker_threads');
@@ -58,7 +58,7 @@ When creating a WorkerPool object, a config object is passed to the "createWorke
 you choose the correct strategy
 - workerOptions: 
     - these are the options that will be passed as is to the worker_threads module or to isolates to allow more customization 
-    - for threads, the options can be seen here: https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options
+    - for threads, the options can be seen [here](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options)
     - for example, set here "eval: true" if you want to provide a script as string in the "bootScript" fields instead of a path
     
 This config option help configure the worker before it is created, however you sometimes need to customize it after it was created or simply to obtain the instance.
@@ -73,7 +73,7 @@ However I present further what you need to do to create a simple implementation 
 
 #### Basic Isolate implementation
 
-```ecmascript 6
+```js
 const syndicate = require('syndicate');
 const ivm = require('isolated-vm');
 const {EventEmitter} = require('events');
@@ -124,7 +124,7 @@ This example is good to grasp what is happening but not helpful in practice beca
 
 #### Isolates implementation that allows for asynchronous work.
 
-```ecmascript 6
+```js
 const syndicate = require('syndicate');
 const ivm = require('isolated-vm');
 const {EventEmitter} = require('events');
@@ -187,7 +187,7 @@ The steps I'll explain correspond to the numbers in the comments at the end of s
 
 2. In this step we assign to "global.__return" (the global object of the target isolate) the reference of the function aforementioned.
 
-3. The isolate need a function inside itself that will handle the task. Now we simply send strings but you can send objects that will help this function decide what needs to be done with the received input. For now, the function "receiveWork" is on global and all it does is to call the "__return" function created previously with the value of "this" set to undefined, the received task and a message. The "__return" function must be called with "apply" because it's not a real function, it is actually wrapper of type Reference that knows how to deal with calls and dereferencing (more information [here] (https://github.com/laverdet/isolated-vm#class-reference-transferable))
+3. The isolate need a function inside itself that will handle the task. Now we simply send strings but you can send objects that will help this function decide what needs to be done with the received input. For now, the function "receiveWork" is on global and all it does is to call the "__return" function created previously with the value of "this" set to undefined, the received task and a message. The "__return" function must be called with "apply" because it's not a real function, it is actually wrapper of type Reference that knows how to deal with calls and dereferencing (more information go [here](https://github.com/laverdet/isolated-vm#class-reference-transferable))
 
 4. Run the script written at step 3 to allow the modifications to take place inside the isolate.
 
