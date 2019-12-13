@@ -39,7 +39,7 @@ Theoretically, any script that can run normally inside a worker_thread will also
 
 # Types of workers
 
-1. The easiest type of worker is based on worker_threads. This is also the default worker. There are no restrictions applied to this type of worker, the only exception is the first message that must be always 'ready' as mentioned previously.
+1. The easiest type of worker is based on worker_threads. This is also the default worker. There are no restrictions applied to this type of worker, the only exception is that he first sent message must always be 'ready' as mentioned previously.
 
 2. The other type of worker is called an "Isolate" because it's based on the module "isolated-vm". This provides a thread that runs only the JavaScript interpreter in a different Node.js context therefore completely isolating and limiting the capabilities of this type of worker in order to offer better security.
 
@@ -47,27 +47,26 @@ Theoretically, any script that can run normally inside a worker_thread will also
 
 When creating a WorkerPool object, a config object is passed to the "createWorkerPool" method. This object has the following configurable fields.
 
-- bootScript: this is a script path in most cases, or it can be a string with the contents of the script (this works only for worker_threads and only by telling the worker threads to eval the string, see workerOptions to see how)
+- bootScript: this is a script path in most cases, or it can be a string with the contents of the script (this works only for worker_threads and only by telling the worker threads to eval the string, see workerOptions to see how), or a function
 - maximumNumberOfWorkers: 
-    - this is an optional files, it takes an unsigned integer meaning the upper bound of the number of workers allowed to be created
+    - this is an optional field, it takes an unsigned integer meaning the upper bound of the number of workers allowed to be created
     - workers will be created lazily, only when they are needed
     - the default value is equal to the number of cores present on the current machine
 - workerStrategy:
     - this is either threads or isolates, but the syndicate module exposes these constants to help
     - the default value is set to threads
-you choose the correct strategy
 - workerOptions: 
     - these are the options that will be passed as is to the worker_threads module or to isolates to allow more customization 
     - for threads, the options can be seen [here](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options)
     - for example, set here "eval: true" if you want to provide a script as string in the "bootScript" fields instead of a path
     
-This config option help configure the worker before it is created, however you sometimes need to customize it after it was created or simply to obtain the instance.
+This config option helps configure the worker before it is created, however you might need to customize it after it was created or simply want to obtain the instance.
 
 For this reason, the "createWorkerPool" method accepts as the second parameter a function that will receive the worker instance before it is added to the pool. 
 
 # How to use Syndicate with Isolates
 
-The easiest way to get you started with an isolated environment that can support "require" and other functionality beside the simple interpreter provided by isolated-vm, you might want to look into [PSKIsolates](https://github.com/PrivateSky/pskisolates)
+The easiest way to get you started with an isolated environment that can support "require" and other functionality beside the simple interpreter provided by isolated-vm, is to use [PSKIsolates](https://github.com/PrivateSky/pskisolates)
 
 However I present further what you need to do to create a simple implementation that works.
 
@@ -187,7 +186,7 @@ The steps I'll explain correspond to the numbers in the comments at the end of s
 
 2. In this step we assign to "global.__return" (the global object of the target isolate) the reference of the function aforementioned.
 
-3. The isolate need a function inside itself that will handle the task. Now we simply send strings but you can send objects that will help this function decide what needs to be done with the received input. For now, the function "receiveWork" is on global and all it does is to call the "__return" function created previously with the value of "this" set to undefined, the received task and a message. The "__return" function must be called with "apply" because it's not a real function, it is actually wrapper of type Reference that knows how to deal with calls and dereferencing (more information go [here](https://github.com/laverdet/isolated-vm#class-reference-transferable))
+3. The isolate need a function inside itself that will handle the task. Now we simply send strings but you can send objects that will help this function decide what needs to be done with the received input. For now, the function "receiveWork" is on global and all it does is to call the "__return" function created previously with the value of "this" set to undefined, the received task and a message. The "__return" function must be called with "apply" because it's not a real function, it is actually a wrapper of type Reference that knows how to deal with calls and dereferencing (for more details go [here](https://github.com/laverdet/isolated-vm#class-reference-transferable))
 
 4. Run the script written at step 3 to allow the modifications to take place inside the isolate.
 
